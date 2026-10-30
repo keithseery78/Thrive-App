@@ -28,3 +28,6 @@ This starter stores entries in browser localStorage on the device/browser being 
 The app is a starter, not a production account-based cloud service. Cross-device sync, sign-in, encryption at rest, automated backup and more advanced chapter/lesson editing can be added in a later version.
 
 Thrive course content is not preloaded. Add only material you are entitled to store and use.
+
+
+Enhanced edition: includes guided journal templates (daily reflection, learning insight, challenging a thought, gratitude and weekly review), a clearer reflection-first dashboard prompt, and refined visual styling. The official Thrive Programme logo has not been supplied; the app uses a simple text-and-symbol identity until you provide an authorised logo image.
