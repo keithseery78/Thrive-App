@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#172b27">
+<title>Thrive Companion</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="#" data-view="dashboard"><span class="brand-mark">✦</span><span><b>THRIVE</b><small>COMPANION</small></span></a>
+    <div class="side-label">YOUR SPACE</div>
+    <nav id="nav">
+      <button class="nav-item active" data-view="dashboard"><span>⌂</span>Overview</button>
+      <button class="nav-item" data-view="programme"><span>▤</span>My programme</button>
+      <button class="nav-item" data-view="exercises"><span>✎</span>Exercises</button>
+      <button class="nav-item" data-view="journal"><span>▧</span>Journal & reflections</button>
+      <button class="nav-item" data-view="beliefs"><span>◉</span>Beliefs</button>
+      <button class="nav-item" data-view="toolkit"><span>✧</span>My toolkit</button>
+      <button class="nav-item" data-view="progress"><span>↗</span>My progress</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="privacy-note"><span>🔒</span><div><b>Your private space</b><small>Saved in this browser</small></div></div>
+      <button class="nav-item" data-view="settings"><span>⚙</span>Settings & backup</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="mobile-brand" data-view="dashboard">✦ THRIVE COMPANION</button>
+      <div class="topbar-right"><span id="todayLabel"></span><button class="avatar" title="Your space">K</button></div>
+    </header>
+    <div id="content" class="content"></div>
+    <footer>THRIVE COMPANION <span>·</span> A little progress, consistently.</footer>
+  </main>
+</div>
+<div id="toast" class="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
