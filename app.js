@@ -1,5 +1,5 @@
 const KEY='thrive-companion-v1';
-const blank=()=>({chapters:[],journal:[],exercises:[],beliefs:[],toolkit:[],checkins:[]});
+const blank=()=>({chapters:[],journal:[],exercises:[],beliefs:[],toolkit:[],checkins:[],videos:[]});
 let data=load(),view='dashboard';
 function load(){try{return {...blank(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return blank()}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data));}
@@ -17,6 +17,7 @@ function render(){
  let html='';
  if(view==='dashboard') html=dashboard();
  if(view==='programme') html=programme();
+ if(view==='videos') html=videos();
  if(view==='journal') html=journal();
  if(view==='exercises') html=exercises();
  if(view==='beliefs') html=beliefs();
@@ -35,6 +36,7 @@ function dashboard(){
  <div class="section-head"><div><h2>Your workspace</h2><p>Everything you need, in one place.</p></div></div>
  <div class="grid quick-grid">
  ${card('▤','My programme','Organise chapters, lessons and notes.','programme')}
+ ${card('▶','Video library','Keep your Thrive Vimeo lessons together.','videos')}
  ${card('✎','Exercises','Capture answers and work through activities.','exercises')}
  ${card('▧','Journal & reflections','Make space for thoughts and learning.','journal')}
  ${card('◉','Beliefs','Explore old beliefs and more helpful alternatives.','beliefs')}
@@ -50,6 +52,13 @@ function programme(){
  <div class="toolbar"><input id="chapterSearch" placeholder="Search your chapters…"><button class="btn" data-action="add-chapter">+ Add chapter</button></div>
  <div class="notice">Add your own chapter titles, summaries and notes. This starter app does not include Thrive course material; you can enter content you have access to and are entitled to use.</div>
  <div id="chapterList" class="grid chapter-grid">${chapters.length?chapters.map(ch=>`<article class="chapter" data-search="${esc((ch.title+' '+ch.summary).toLowerCase())}"><div class="num">CHAPTER ${esc(ch.number||'—')}</div><h3>${esc(ch.title)}</h3><p>${esc(ch.summary||'Add a short description of what this chapter covers.')}</p><div class="progress-track"><div class="progress-fill" style="width:${ch.done?100:0}%"></div></div><div class="chapter-foot"><span class="pill">${ch.done?'Completed':'In progress'}</span><button class="btn outline small" data-action="toggle-chapter" data-id="${ch.id}">${ch.done?'Reopen':'Mark done'}</button></div><div class="actions"><button class="btn outline small" data-action="edit-chapter" data-id="${ch.id}">Edit</button><button class="btn outline small" data-action="delete-chapter" data-id="${ch.id}">Delete</button></div></article>`).join(''):`<div class="empty" style="grid-column:1/-1"><strong>Your programme library starts here.</strong>Add your first chapter to begin organising your learning.</div>`}</div>`;
+}
+function videos(){
+ const list=data.videos.slice().sort((a,b)=>b.created-a.created);
+ return `${header('WATCH · LEARN · REVISIT','My video library','Save your Thrive Vimeo lesson links, organise them by chapter and keep notes on what you take from each video.')}
+ <div class="panel"><h3>Save a Vimeo video</h3><div class="field"><label>Video title</label><input id="vTitle" placeholder="e.g. Introduction to beliefs"></div><div class="field"><label>Vimeo link</label><input id="vUrl" type="url" placeholder="https://vimeo.com/…"></div><div class="field"><label>Chapter or topic (optional)</label><input id="vTopic" placeholder="e.g. Chapter 2 – Beliefs"></div><div class="field"><label>My notes (optional)</label><textarea id="vNotes" placeholder="What do I want to remember or put into practice?"></textarea></div><button class="btn" data-action="save-video">Save video</button><p class="muted" style="font-size:11px;margin-top:10px">Save the lesson link rather than copying the video. Private or course-restricted Vimeo videos will still require your normal Kajabi/Vimeo access.</p></div>
+ <div class="section-head"><div><h2>Saved videos</h2><p>${list.length} saved links</p></div></div>
+ ${list.length?`<div class="grid chapter-grid">${list.map(v=>`<article class="chapter"><div class="num">${esc(v.topic||'THRIVE VIDEO')}</div><h3>${esc(v.title)}</h3>${v.notes?`<p>${esc(v.notes)}</p>`:''}<div class="actions"><a class="btn outline small" href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">Open video ↗</a><button class="btn outline small" data-action="delete-entry" data-id="${v.id}" data-type="video">Delete</button></div></article>`).join('')}</div>`:`<div class="empty"><strong>Your video library is ready.</strong>Save a Vimeo link above and it will appear here.</div>`}`;
 }
 function journal(){
  return `${header('THINK · NOTICE · REFLECT','Journal & reflections','A private space to slow down, notice patterns and turn learning into everyday action.')}
@@ -82,7 +91,7 @@ function progress(){
  return `${header('LOOK BACK & NOTICE','My progress','Your progress is more than a number. This page gives you a snapshot of the work you have captured.')}
  <div class="grid stats"><div class="stat"><div class="stat-label">CHAPTERS COMPLETED</div><div class="stat-value">${done}/${total}</div><div class="stat-foot">Programme progress</div></div><div class="stat"><div class="stat-label">JOURNAL ENTRIES</div><div class="stat-value">${data.journal.length}</div><div class="stat-foot">Thoughts and reflections</div></div><div class="stat"><div class="stat-label">EXERCISES</div><div class="stat-value">${data.exercises.length}</div><div class="stat-foot">Saved activities</div></div></div>
  <div class="panel"><div class="section-head" style="margin-top:0"><h2>Programme completion</h2><b>${pct}%</b></div><div class="progress-track" style="height:11px"><div class="progress-fill" style="width:${pct}%"></div></div><p class="muted" style="font-size:11px;margin-top:12px">${total?`${done} of ${total} chapters marked complete.`:'Add chapters to start tracking your programme.'}</p></div>
- <div class="grid two-col" style="margin-top:16px"><div class="panel"><h3>Your activity</h3>${[['Reflections',data.journal.length],['Exercises',data.exercises.length],['Belief explorations',data.beliefs.length],['Toolkit items',data.toolkit.length]].map(([n,v])=>`<div class="list-row"><span>${n}</span><b>${v}</b></div>`).join('')}</div><div class="panel"><h3>A note on progress</h3><p style="font-size:12px;color:#647169;line-height:1.7">Use these numbers as a record of activity, not a judgement of how well you're doing. A meaningful insight or a small change in everyday life can matter more than ticking off a box.</p></div></div>`;
+ <div class="grid two-col" style="margin-top:16px"><div class="panel"><h3>Your activity</h3>${[['Reflections',data.journal.length],['Exercises',data.exercises.length],['Belief explorations',data.beliefs.length],['Toolkit items',data.toolkit.length],['Vimeo videos',data.videos.length]].map(([n,v])=>`<div class="list-row"><span>${n}</span><b>${v}</b></div>`).join('')}</div><div class="panel"><h3>A note on progress</h3><p style="font-size:12px;color:#647169;line-height:1.7">Use these numbers as a record of activity, not a judgement of how well you're doing. A meaningful insight or a small change in everyday life can matter more than ticking off a box.</p></div></div>`;
 }
 function settings(){
  return `${header('YOUR DATA','Settings & backup','Your entries are stored in this browser on this device. Export a backup regularly.')}
@@ -102,11 +111,12 @@ function actions(a,id,type){
  gratitude:['Gratitude','What are three things I appreciate today?\\nWhy do they matter to me?\\nHow can I make a little more space for them?'],
  weekly:['Weekly review','What did I learn this week?\\nWhere did I put that learning into practice?\\nWhat am I proud of?\\nWhat got in the way?\\nWhat is one focus for next week?']
  };const t=templates[id];if(t){document.getElementById('jCategory').value=t[0];document.getElementById('jTitle').value=t[0];document.getElementById('jBody').value=t[1];document.getElementById('jBody').focus();toast('Reflection template loaded')}}
+ if(a==='save-video'){const title=val('vTitle'),url=val('vUrl');if(!title||!url)return toast('Add a title and Vimeo link first');let parsed;try{parsed=new URL(url)}catch(_){return toast('Enter a valid Vimeo link')};if(!['vimeo.com','www.vimeo.com','player.vimeo.com'].includes(parsed.hostname.toLowerCase()))return toast('Please enter a Vimeo link');data.videos.push({id:crypto.randomUUID(),title,url,topic:val('vTopic'),notes:val('vNotes'),created:Date.now()});save();render();toast('Vimeo video saved')}
  if(a==='save-journal'){if(!val('jTitle')||!val('jBody'))return toast('Add a title and reflection first');data.journal.push({id:crypto.randomUUID(),title:val('jTitle'),category:val('jCategory'),body:val('jBody'),created:Date.now()});save();render();toast('Reflection saved')}
  if(a==='save-exercise'){if(!val('eTitle'))return toast('Add an exercise name first');data.exercises.push({id:crypto.randomUUID(),title:val('eTitle'),topic:val('eTopic'),prompt:val('ePrompt'),answer:val('eAnswer'),created:Date.now()});save();render();toast('Exercise saved')}
  if(a==='save-belief'){if(!val('bOld'))return toast('Add the belief you want to explore');data.beliefs.push({id:crypto.randomUUID(),old:val('bOld'),title:'Belief reflection',source:val('bSource'),evidence:val('bEvidence'),newBelief:val('bNew'),created:Date.now()});save();render();toast('Belief reflection saved')}
  if(a==='save-tool'){if(!val('tTitle')||!val('tBody'))return toast('Add a title and details');data.toolkit.push({id:crypto.randomUUID(),title:val('tTitle'),type:val('tType'),body:val('tBody'),created:Date.now()});save();render();toast('Added to your toolkit')}
- if(a==='delete-entry'&&confirm('Delete this entry?')){let k={journal:'journal',exercise:'exercises',belief:'beliefs',tool:'toolkit'}[type];data[k]=data[k].filter(x=>x.id!==id);save();render();toast('Entry deleted')}
+ if(a==='delete-entry'&&confirm('Delete this entry?')){let k={journal:'journal',exercise:'exercises',belief:'beliefs',tool:'toolkit',video:'videos'}[type];data[k]=data[k].filter(x=>x.id!==id);save();render();toast('Entry deleted')}
  if(a==='export'){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),link=document.createElement('a');link.href=u;link.download='thrive-companion-backup-'+new Date().toISOString().slice(0,10)+'.json';link.click();URL.revokeObjectURL(u);toast('Backup downloaded')}
  if(a==='reset'&&confirm('Are you absolutely sure? This cannot be undone unless you have a backup.')){data=blank();save();render();toast('Local data cleared')}
 }
